@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<map>
+    <int name="banner_size" value="160" />
+    <boolean name="recommendations_oob_ranking_marker" value="true" />
+    <string name="apps_ranker_sorting_mode">FIXED</string>
+    <boolean name="launcher_oob_ranking_marker" value="true" />
+    <boolean name="enable_favorites_row" value="false" />
+    <boolean name="enable_music_row" value="false" />
+    <boolean name="enable_videos_row" value="false" />
+    <boolean name="enable_games_row" value="false" />
+    <int name="max_apps_rows" value="3" />
+    <int name="max_apps" value="6" />
+    <int name="banner_corner_radius" value="10" />
+</map>

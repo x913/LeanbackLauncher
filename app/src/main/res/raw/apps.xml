@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<map>
+    <boolean name="com.smartup.tv" value="false" />
+    <boolean name="com.ionitech.airscreen" value="true" />
+    <boolean name="com.mxtech.videoplayer.ad" value="true" />
+    <boolean name="com.aurora.store" value="true" />
+    <boolean name="com.droidlogic.videoplayer" value="true" />
+</map>
