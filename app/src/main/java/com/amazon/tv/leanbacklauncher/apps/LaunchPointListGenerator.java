@@ -90,9 +90,6 @@ public class LaunchPointListGenerator {
 
         @SuppressLint("PrivateResource")
         public void apply() {
-
-            Log.d("AAA", "apply");
-
             switch (this.mAction) {
                 case 0 /*0*/:
                     LaunchPointListGenerator.this.addOrUpdatePackage(this.mPkgName);
