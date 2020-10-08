@@ -5,6 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,79 +18,38 @@ import java.util.List;
 
 public class CleanDeviceMemory extends Activity {
 
+    private Thread mThread;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("CleanDeviceMemory","onCreate");
-        //Context context = getApplicationContext();
-        //CharSequence text = "%USERNAME% Mydak !";
-        //int duration = Toast.LENGTH_SHORT;
 
-        //Toast toast = Toast.makeText(context, text, duration);
-        //toast.show();
-        showClean();
-        finish();
-    }
-
-    private void showClean(){
-        new killProcessesThread().start();
-    }
-
-    public class killProcessesThread extends Thread {
-        @Override
-        public void run() {
-            while (true) {
-                try {
-                    Thread.sleep(3000L);
-                    killBackgroundProcesses();
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
-                    continue;
+        mThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // killing background processes
+                PackageManager pm = getPackageManager();
+                List<ApplicationInfo> installedPackages = pm.getInstalledApplications(0);
+                ActivityManager mActivityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+                for (ApplicationInfo applicationInfo : installedPackages) {
+                    if ((applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 1)
+                        continue;
+                    if(getApplicationContext().getPackageName().equalsIgnoreCase(applicationInfo.packageName))
+                        continue;
+                    mActivityManager.killBackgroundProcesses(applicationInfo.packageName);
                 }
-                break;
-            }
-        }
-    }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), getString(R.string.memory_has_been_cleared), Toast.LENGTH_SHORT)
+                                .show();
 
-    private void killBackgroundProcesses() {
-        ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-        List<ActivityManager.RunningAppProcessInfo> list = am.getRunningAppProcesses();
-
-        if (list != null) {
-            for (int i = 0; i < list.size(); i++) {
-                try {
-                    Thread.sleep(100L);
-                    ActivityManager.RunningAppProcessInfo apinfo = list.get(i);
-                    String[] pkgList = apinfo.pkgList;
-
-                    if (apinfo.importance > ActivityManager.RunningAppProcessInfo.IMPORTANCE_SERVICE) {
-                        // Process.killProcess(apinfo.pid);
-                        for (int j = 0; j < pkgList.length; j++) {
-                            am.killBackgroundProcesses(pkgList[j]);
-                            myHander.sendEmptyMessage(0);
-                        }
+                        finish();
                     }
-                } catch (InterruptedException localInterruptedException) {
-                    localInterruptedException.printStackTrace();
-                }
+                });
             }
-
-        } myHander.sendEmptyMessage(1);
+        });
+        mThread.start();
     }
 
-    Handler myHander = new Handler() {
-        public void handleMessage(final Message message) {
-            switch (message.what) {
-                default: {}
-                case 1: {
-                    Context context = getApplicationContext();
-                    CharSequence text = "Очищено !";
-                    int duration = Toast.LENGTH_SHORT;
-
-                    Toast toast = Toast.makeText(context, text, duration);
-                    toast.show();
-                }
-            }
-        }
-    };
 }
