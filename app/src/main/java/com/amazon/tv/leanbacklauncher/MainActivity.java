@@ -1,6 +1,7 @@
 package com.amazon.tv.leanbacklauncher;
 
 import java.io.*;
+
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.AlarmManager;
@@ -29,6 +30,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -264,10 +266,10 @@ public class MainActivity extends Activity implements OnEditModeChangedListener,
         void onVisibilityChange(boolean z);
     }
 
-    public void copyDefaultSettings(String resource_filename, String out_filename, String Folder){
+    public void copyDefaultSettings(String resource_filename, String out_filename, String Folder) {
         Log.i("onCreateEvent", "Setup::copyDefaultSettings");
         int resId = getResources().getIdentifier(resource_filename, "raw", getPackageName());
-        if(Folder.length() == 0) {
+        if (Folder.length() == 0) {
             Folder = "/data/data/" + getPackageName() + "/shared_prefs";
         }
         String toPath = Folder;
@@ -279,20 +281,20 @@ public class MainActivity extends Activity implements OnEditModeChangedListener,
         String full_filename = getApplicationContext().getResources().getResourceEntryName(resId);
         String filename = out_filename;
         String full_out_filename = toPath + "/" + filename;
-        Log.i("onCreateEvent", "Setup::copyDefaultSettings toPath =  "+toPath);
-        Log.i("onCreateEvent", "Setup::copyDefaultSettings full_filename =  "+full_filename);
-        Log.i("onCreateEvent", "Setup::copyDefaultSettings filename =  "+filename);
+        Log.i("onCreateEvent", "Setup::copyDefaultSettings toPath =  " + toPath);
+        Log.i("onCreateEvent", "Setup::copyDefaultSettings full_filename =  " + full_filename);
+        Log.i("onCreateEvent", "Setup::copyDefaultSettings filename =  " + filename);
 
         InputStream in = getApplicationContext().getResources().openRawResource(resId);
         //File in_file = new File(full_filename);
         File out_file = new File(full_out_filename);
 
         try {
-            Log.i("onCreateEvent", "Setup::copyFile "+full_out_filename);
+            Log.i("onCreateEvent", "Setup::copyFile " + full_out_filename);
             OutputStream out = new FileOutputStream(out_file);
             byte[] buffer = new byte[8192];
             int len;
-            while((len = in.read(buffer, 0, buffer.length)) != -1){
+            while ((len = in.read(buffer, 0, buffer.length)) != -1) {
                 out.write(buffer, 0, len);
                 Log.i("onCreateEvent", "Setup::writeBuffer ");
             }
@@ -303,20 +305,20 @@ public class MainActivity extends Activity implements OnEditModeChangedListener,
             out.flush();
             out.close();
         } catch (FileNotFoundException e) {
-            Log.i("onCreateEvent", "Setup::copyDefaultSettings - "+e.getMessage());
+            Log.i("onCreateEvent", "Setup::copyDefaultSettings - " + e.getMessage());
         } catch (IOException e) {
-            Log.i("onCreateEvent", "Setup::copyDefaultSettings - "+e.getMessage());
+            Log.i("onCreateEvent", "Setup::copyDefaultSettings - " + e.getMessage());
         }
     }
 
     protected void onCreate(Bundle savedInstanceState) {
         AppTrace.beginSection("onCreate");
 
-        copyDefaultSettings("preferences", getPackageName() + "_preferences.xml","");
-        copyDefaultSettings("apps", "hidden-apps.xml","");
-        copyDefaultSettings("prefs", "inet-prefs.xml","");
-        copyDefaultSettings("fav", "favorite-apps.xml","");
-        copyDefaultSettings("test", "test.xml","");
+        copyDefaultSettings("preferences", getPackageName() + "_preferences.xml", "");
+        copyDefaultSettings("apps", "hidden-apps.xml", "");
+        copyDefaultSettings("prefs", "inet-prefs.xml", "");
+        copyDefaultSettings("fav", "favorite-apps.xml", "");
+        copyDefaultSettings("test", "test.xml", "");
         //copyDefaultSettings("launcher", "launcher.db","/data/data/"+getPackageName()+"/databases");
         //copyDefaultSettings("launcherjournal", "launcher.db-journal","/data/data/"+getPackageName()+"/databases");
         //copyDefaultSettings("recomendations", "recomendations.db","/data/data/"+getPackageName()+"/databases");
@@ -529,17 +531,18 @@ public class MainActivity extends Activity implements OnEditModeChangedListener,
     }
 
     public void onUninstallPressed(String packageName) {
-        Log.d("AAA","onUninstallPressed" + packageName);
-
-        Toast.makeText(getBaseContext(), "Sorry but you can not uninstall this app",
-                Toast.LENGTH_SHORT).show();
-
-//        if (packageName != null && !this.mUninstallRequested) {
-//            this.mUninstallRequested = true;
-//            Intent uninstallIntent = new Intent("android.intent.action.UNINSTALL_PACKAGE", Uri.parse("package:" + packageName));
-//            uninstallIntent.putExtra("android.intent.extra.RETURN_RESULT", true);
-//            startActivityForResult(uninstallIntent, 321);
-//        }
+        if (TextUtils.isEmpty(packageName)) {
+            Toast.makeText(this, getString(R.string.uninstall_is_forbidden), Toast.LENGTH_SHORT)
+                    .show();
+        }
+        else {
+            if (packageName != null && !this.mUninstallRequested) {
+                this.mUninstallRequested = true;
+                Intent uninstallIntent = new Intent("android.intent.action.UNINSTALL_PACKAGE", Uri.parse("package:" + packageName));
+                uninstallIntent.putExtra("android.intent.extra.RETURN_RESULT", true);
+                startActivityForResult(uninstallIntent, 321);
+            }
+        }
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -1066,7 +1069,7 @@ public class MainActivity extends Activity implements OnEditModeChangedListener,
                     wrapper.addView(LayoutInflater.from(this).inflate(R.layout.clock, wrapper, false));
                     Typeface typeface = ResourcesCompat.getFont(this, R.font.sfuidisplay_thin);
                     TextView clockview = (ClockView) findViewById(R.id.clock);
-                    if (clockview != null && typeface != null )
+                    if (clockview != null && typeface != null)
                         clockview.setTypeface(typeface);
                     return;
                 }

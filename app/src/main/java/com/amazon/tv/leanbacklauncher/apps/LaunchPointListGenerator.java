@@ -577,6 +577,7 @@ public class LaunchPointListGenerator {
         intent_custom.putExtra("DisableAnimation","1");
 
         //this.mContext.startActivity(intent_custom);
+
         LaunchPoint lp_custom = new LaunchPoint(this.mContext, mContext.getString(R.string.clean_memory), mContext.getDrawable(R.drawable.ic_mem_clean), intent_custom, 0);
         lp_custom.setPriority(100);
         settingsItems.add(lp_custom);

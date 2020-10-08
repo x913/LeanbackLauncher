@@ -12,6 +12,7 @@ import android.view.ViewTreeObserver.OnGlobalFocusChangeListener;
 import android.view.accessibility.AccessibilityManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.leanback.widget.OnChildViewHolderSelectedListener;
 import androidx.recyclerview.widget.RecyclerView;
@@ -247,6 +248,11 @@ public class EditableAppsRowView extends ActiveItemsRowView implements OnGlobalF
         if (lastFocusedViewHolder == null || !(getAdapter() instanceof AppsAdapter)) {
             return packageName;
         }
+
+        if(!isUninstallAllowed(lastFocusedViewHolder.itemView)) {
+            return null;
+        }
+
         return getViewPackageName(lastFocusedViewHolder.itemView);
     }
 
@@ -259,6 +265,11 @@ public class EditableAppsRowView extends ActiveItemsRowView implements OnGlobalF
             }
         }
         return null;
+    }
+
+    private boolean isUninstallAllowed(View view) {
+        LaunchPoint lp = getViewLaunchPoint(view);
+        return lp != null ? lp.isUninstallAllowed() : false;
     }
 
     private String getViewPackageName(View view) {

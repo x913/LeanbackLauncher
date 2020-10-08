@@ -60,6 +60,10 @@ public class LaunchPoint {
         return mAppCategory;
     }
 
+    public Boolean isUninstallAllowed() {
+        return !UninstallBlackListApp.isAppInList(mPackageName);
+    }
+
     public LaunchPoint() {
 
     }

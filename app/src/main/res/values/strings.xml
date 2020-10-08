@@ -250,4 +250,7 @@ or recommendations will not work properly."</string>
     <string name="v7_preference_on">ON</string>
     <string name="videos_row_title">Show Videos Row</string>
     <string name="wallpaper_title">Default Wallpaper</string>
+    <string name="uninstall_is_forbidden">You can not uninstall this app</string>
+    <string name="hiding_is_forbidden">You can not hide this app</string>
+    <string name="memory_has_been_cleared">Memory has been cleared</string>
 </resources>

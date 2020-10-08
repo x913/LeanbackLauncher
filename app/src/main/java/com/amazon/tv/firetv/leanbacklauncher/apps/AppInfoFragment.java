@@ -3,6 +3,7 @@ package com.amazon.tv.firetv.leanbacklauncher.apps;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.leanback.app.GuidedStepFragment;
@@ -12,6 +13,7 @@ import androidx.leanback.widget.GuidedAction;
 import com.amazon.tv.firetv.leanbacklauncher.util.FireTVUtils;
 import com.amazon.tv.firetv.leanbacklauncher.util.SharedPreferencesUtil;
 import com.amazon.tv.leanbacklauncher.R;
+import com.amazon.tv.leanbacklauncher.apps.UninstallBlackListApp;
 
 import java.util.ArrayList;
 
@@ -80,12 +82,19 @@ public class AppInfoFragment extends GuidedStepFragment {
                     util.unfavorite(pkg);
                 }
             } else if (action.getId() == ACTION_ID_HIDE) {
-                boolean hidden = !util.isHidden(pkg);
 
-                if (hidden) {
-                    util.hide(pkg);
+                if(UninstallBlackListApp.isAppInList(pkg)) {
+
+                    Toast.makeText(context, context.getString(R.string.hiding_is_forbidden), Toast.LENGTH_SHORT)
+                            .show();
+
                 } else {
-                    util.unhide(pkg);
+                    boolean hidden = !util.isHidden(pkg);
+                    if (hidden) {
+                        util.hide(pkg);
+                    } else {
+                        util.unhide(pkg);
+                    }
                 }
             }
         }
