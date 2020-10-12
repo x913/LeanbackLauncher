@@ -27,6 +27,7 @@ import android.media.tv.TvContract;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
@@ -53,6 +54,7 @@ import androidx.recyclerview.widget.RecyclerView.OnScrollListener;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
 import com.amazon.tv.firetv.leanbacklauncher.apps.AppInfoActivity;
+import com.amazon.tv.firetv.leanbacklauncher.apps.RowType;
 import com.amazon.tv.firetv.tvrecommendations.NotificationListenerMonitor;
 import com.amazon.tv.leanbacklauncher.animation.AnimatorLifecycle;
 import com.amazon.tv.leanbacklauncher.animation.AnimatorLifecycle.OnAnimationFinishedListener;
@@ -381,11 +383,12 @@ public class MainActivity extends Activity implements OnEditModeChangedListener,
             final NotificationsAdapter recAdapter = this.mHomeAdapter.getRecommendationsAdapter();
             addIdleListener(recAdapter);
             this.mList.setOnHierarchyChangeListener(new OnHierarchyChangeListener() {
-                public void onChildViewAdded(View parent, View child) {
+                public void onChildViewAdded(View parent, final View child) {
                     int tag = 0;
                     if (child.getTag() instanceof Integer) {
                         tag = (Integer) child.getTag();
                     }
+
                     switch (tag) {
                         case 0: // SEARCH
                             if (child instanceof SearchOrbView) {
@@ -419,6 +422,28 @@ public class MainActivity extends Activity implements OnEditModeChangedListener,
                                     }
                                 });
                                 break;
+                            }
+                            break;
+                        case 3: // APPS
+                            if(child instanceof ActiveFrame) {
+
+                                MainActivity.this.mHandler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        ActiveFrame activeFrame = (ActiveFrame)child;
+                                        ActiveItemsRowView activeItemsRowView = activeFrame.mRow;
+                                        for(int i = 0; i < activeItemsRowView.getChildCount(); i++) {
+                                            View viewChild = activeItemsRowView.getChildAt(i);
+                                            if(viewChild instanceof BannerView && i == 0) {
+                                                BannerView bannerView = (BannerView)viewChild;
+                                                bannerView.requestFocus();
+                                            }
+                                        }
+                                    }
+                                }, 100);
+
+
+
                             }
                             break;
                     }
@@ -984,13 +1009,12 @@ public class MainActivity extends Activity implements OnEditModeChangedListener,
     }
 
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_MENU || keyCode == KeyEvent.KEYCODE_INFO) {
+        if (keyCode == KeyEvent.KEYCODE_MENU || keyCode == KeyEvent.KEYCODE_INFO || keyCode == KeyEvent.KEYCODE_D) {
             View selectItem = mList.getFocusedChild();
 
             if (selectItem instanceof ActiveFrame) {
                 ActiveItemsRowView v = ((ActiveFrame) selectItem).mRow;
                 View child = v.getFocusedChild(); // todo
-
                 if (child instanceof BannerView) {
                     BannerView banner = (BannerView) child;
                     AppsAdapter.AppViewHolder holder = banner.getViewHolder();
