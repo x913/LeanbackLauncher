@@ -68,6 +68,8 @@ public class BannerView extends FrameLayout implements OnLongClickListener, Dimm
         }
     }
 
+
+
     protected void onFinishInflate() {
         super.onFinishInflate();
         Context ctx = getContext();

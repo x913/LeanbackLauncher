@@ -1,12 +1,14 @@
 package com.amazon.tv.leanbacklauncher;
 
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.View;
 
 import androidx.recyclerview.widget.RecyclerView.Adapter;
 import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver;
 
 import com.amazon.tv.firetv.leanbacklauncher.apps.RowType;
+import com.amazon.tv.leanbacklauncher.apps.AppsAdapter;
 
 public class HomeScreenRow extends AdapterDataObserver {
     private Adapter<?> mAdapter;
@@ -128,4 +130,11 @@ public class HomeScreenRow extends AdapterDataObserver {
             }
         }
     }
+
+    public void getCustomAdapter() {
+        if(getType() == RowType.APPS) {
+            AppsAdapter adapter = (AppsAdapter)mAdapter;
+        }
+    }
+
 }

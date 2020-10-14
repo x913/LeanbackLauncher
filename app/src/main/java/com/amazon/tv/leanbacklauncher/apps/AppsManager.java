@@ -3,6 +3,7 @@ package com.amazon.tv.leanbacklauncher.apps;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import androidx.recyclerview.widget.RecyclerView.Adapter;
 

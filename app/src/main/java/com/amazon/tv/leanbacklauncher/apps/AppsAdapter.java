@@ -8,8 +8,10 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -455,6 +457,7 @@ public class AppsAdapter extends RowViewAdapter<AppsAdapter.AppViewHolder> imple
         this.mFlaggedForResort = false;
         this.mActionOpenLaunchPointListener = actionOpenLaunchPointListener;
         this.mAppsManager.registerLaunchPointListGeneratorListener(this);
+
     }
 
     public int getItemViewType(int position) {

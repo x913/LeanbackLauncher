@@ -266,7 +266,6 @@ public class LaunchPointListGenerator {
     }
 
     public void removePackage(String pkgName) {
-        Log.d("AAA", "removePackage");
         if (!TextUtils.isEmpty(pkgName)) {
             synchronized (this.mCachedActions) {
                 if (this.mIsReady) {

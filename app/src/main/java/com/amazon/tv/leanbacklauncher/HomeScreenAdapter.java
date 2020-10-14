@@ -8,6 +8,7 @@ import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +31,7 @@ import com.amazon.tv.leanbacklauncher.HomeScrollManager.HomeScrollFractionListen
 import com.amazon.tv.leanbacklauncher.apps.AppsAdapter;
 import com.amazon.tv.leanbacklauncher.apps.AppsManager;
 import com.amazon.tv.leanbacklauncher.apps.ConnectivityListener;
+import com.amazon.tv.leanbacklauncher.apps.LaunchPoint;
 import com.amazon.tv.leanbacklauncher.apps.OnEditModeChangedListener;
 import com.amazon.tv.leanbacklauncher.apps.SettingsAdapter;
 import com.amazon.tv.leanbacklauncher.inputs.InputsAdapter;
@@ -224,6 +226,7 @@ public class HomeScreenAdapter extends Adapter<HomeScreenAdapter.HomeViewHolder>
     private void addRowEntry(HomeScreenRow row) {
         this.mAllRowsList.add(row);
         row.setChangeListener(this);
+
         if (row.getType() != RowType.NOTIFICATIONS && row.getType() != RowType.ACTUAL_NOTIFICATIONS && row.getType() != RowType.SEARCH) {
             this.mAppsManager.addAppRow(row);
         }

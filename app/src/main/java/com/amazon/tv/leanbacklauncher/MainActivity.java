@@ -3,6 +3,7 @@ package com.amazon.tv.leanbacklauncher;
 import java.io.*;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.ActivityOptions;
 import android.app.AlarmManager;
 import android.app.LoaderManager.LoaderCallbacks;
@@ -70,6 +71,7 @@ import com.amazon.tv.leanbacklauncher.animation.NotificationLaunchAnimator;
 import com.amazon.tv.leanbacklauncher.animation.ParticipatesInLaunchAnimation;
 import com.amazon.tv.leanbacklauncher.apps.AppsAdapter;
 import com.amazon.tv.leanbacklauncher.apps.AppsManager;
+import com.amazon.tv.leanbacklauncher.apps.AppsRanker;
 import com.amazon.tv.leanbacklauncher.apps.BannerView;
 import com.amazon.tv.leanbacklauncher.apps.OnEditModeChangedListener;
 import com.amazon.tv.leanbacklauncher.clock.ClockView;
@@ -96,8 +98,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.List;
 
-public class MainActivity extends Activity implements OnEditModeChangedListener, OnEditModeUninstallPressedListener {
+public class MainActivity extends Activity implements OnEditModeChangedListener, OnEditModeUninstallPressedListener, AppsRanker.RankingListener {
     private AccessibilityManager mAccessibilityManager;
     private boolean mAppEditMode;
     private AppWidgetHost mAppWidgetHost;
@@ -112,6 +115,11 @@ public class MainActivity extends Activity implements OnEditModeChangedListener,
     private Handler mHandler = new MainActivityMessageHandler(this);
 
     private static String TAG = "LeanbackLauncher";
+
+    @Override
+    public void onRankerReady() {
+        this.mHandler.sendEmptyMessage(3);
+    }
 
     private static class MainActivityMessageHandler extends Handler {
         private MainActivity activity;
@@ -134,7 +142,7 @@ public class MainActivity extends Activity implements OnEditModeChangedListener,
                         activity.mIdleListeners.get(i).onIdleStateChange(activity.mIsIdle);
                     }
                     return;
-                case 3: // Focus to Reccomendations or 1st Apps row
+                case 3: // Focus to recommendations or 1st Apps row
                     if (activity.mResetAfterIdleEnabled) {
                         activity.mKeepUiReset = true;
                         activity.resetLauncherState(true);
@@ -264,7 +272,6 @@ public class MainActivity extends Activity implements OnEditModeChangedListener,
 
     public interface IdleListener {
         void onIdleStateChange(boolean z);
-
         void onVisibilityChange(boolean z);
     }
 
@@ -425,25 +432,21 @@ public class MainActivity extends Activity implements OnEditModeChangedListener,
                             }
                             break;
                         case 3: // APPS
+                            //mHandler.sendEmptyMessage(3);
                             if(child instanceof ActiveFrame) {
-
-                                MainActivity.this.mHandler.postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        ActiveFrame activeFrame = (ActiveFrame)child;
-                                        ActiveItemsRowView activeItemsRowView = activeFrame.mRow;
-                                        for(int i = 0; i < activeItemsRowView.getChildCount(); i++) {
-                                            View viewChild = activeItemsRowView.getChildAt(i);
-                                            if(viewChild instanceof BannerView && i == 0) {
-                                                BannerView bannerView = (BannerView)viewChild;
-                                                bannerView.requestFocus();
-                                            }
-                                        }
-                                    }
-                                }, 100);
-
-
-
+//                                MainActivity.this.mHandler.postDelayed(new Runnable() {
+//                                    @Override
+//                                    public void run() {
+//                                        ActiveFrame activeFrame = (ActiveFrame)child;
+//                                        ActiveItemsRowView activeItemsRowView = activeFrame.mRow;
+//                                        View viewChild = activeItemsRowView.getChildAt(0);
+//                                        if(viewChild instanceof BannerView) {
+//                                            BannerView bannerView = (BannerView)viewChild;
+//                                            bannerView.requestFocus();
+//                                            bannerView.setSelected(true);
+//                                        }
+//                                    }
+//                                }, 1000);
                             }
                             break;
                     }
@@ -483,6 +486,9 @@ public class MainActivity extends Activity implements OnEditModeChangedListener,
             registerReceiver(this.mHomeRefreshReceiver, filterHome);
             getLoaderManager().initLoader(0, null, this.mSearchIconCallbacks);
             getLoaderManager().initLoader(1, null, this.mSearchSuggestionsCallbacks);
+
+            AppsRanker.getInstance(getApplicationContext()).setOnRankerReady(this);
+
         } finally {
             AppTrace.endSection();
         }
@@ -693,7 +699,6 @@ public class MainActivity extends Activity implements OnEditModeChangedListener,
     }
 
     private void resetLauncherState(boolean smooth) {
-        if (BuildConfig.DEBUG) Log.d("***** resetLauncherState", "smooth: " + smooth);
         this.mScrollManager.onScrolled(0, 0);
         this.mUserInteracted = false;
         this.mHomeAdapter.resetRowPositions(smooth);
@@ -721,20 +726,18 @@ public class MainActivity extends Activity implements OnEditModeChangedListener,
                 this.mNotificationsView.setIgnoreNextActivateBackgroundChange();
             }
         } else { // focus on 1st Apps cat || Search (0)
-            int ar[] = {0}; // 0, 4, 8, 9, 7 - SEARCH, GAMES, MUSIC, VIDEO, FAVORITES as in buildRowList()
+//            int ar[] = {0}; // 0, 4, 8, 9, 7 - SEARCH, GAMES, MUSIC, VIDEO, FAVORITES as in buildRowList()
+            int ar[] = {3};
             int i, x;
             for (i = 0; i < ar.length; i++) {
                 x = ar[i];
                 int appIndex = this.mHomeAdapter.getRowIndex(x);
                 if (!(appIndex == -1 || this.mList.getSelectedPosition() == appIndex)) {
-                    if (BuildConfig.DEBUG)
-                        Log.d("***** resetLauncherState", "set focus to " + appIndex);
-                    //if (smooth) {
-                    this.mList.setSelectedPositionSmooth(appIndex);
-                    //} else {
-                    this.mList.setSelectedPosition(appIndex);
-                    //}
-                    //this.mList.getChildAt(0).requestFocus();
+                    if (smooth) {
+                        this.mList.setSelectedPositionSmooth(appIndex);
+                    } else {
+                        this.mList.setSelectedPosition(appIndex);
+                    }
                 }
             }
         }
@@ -834,8 +837,11 @@ public class MainActivity extends Activity implements OnEditModeChangedListener,
             } else {
                 this.mHandler.sendEmptyMessageDelayed(1, this.mIdlePeriod);
             }
+
+
             this.mHandler.sendEmptyMessageDelayed(3, this.mResetPeriod);
             this.mHandler.sendEmptyMessageDelayed(7, 2000);
+
             if (this.mLaunchAnimation.isFinished()) {
                 this.mLaunchAnimation.reset();
             }
@@ -951,7 +957,7 @@ public class MainActivity extends Activity implements OnEditModeChangedListener,
     }
 
     private void onNotificationRowStateUpdate(int state) {
-        Log.d("*****", "onNotificationRowStateUpdate(" + state + ") selected postion: " + mList.getSelectedPosition());
+        Log.d("AAA", "onNotificationRowStateUpdate(" + state + ") selected postion: " + mList.getSelectedPosition());
         if (state == 1 || state == 2) {
             if (!this.mUserInteracted) {
                 int searchIndex = this.mHomeAdapter.getRowIndex(0);
@@ -1009,6 +1015,12 @@ public class MainActivity extends Activity implements OnEditModeChangedListener,
     }
 
     public boolean onKeyUp(int keyCode, KeyEvent event) {
+        // todo remove it
+        if(keyCode == KeyEvent.KEYCODE_F) {
+            this.mHandler.sendEmptyMessageAtTime(3, 500);
+            return  true;
+        }
+
         if (keyCode == KeyEvent.KEYCODE_MENU || keyCode == KeyEvent.KEYCODE_INFO || keyCode == KeyEvent.KEYCODE_D) {
             View selectItem = mList.getFocusedChild();
 

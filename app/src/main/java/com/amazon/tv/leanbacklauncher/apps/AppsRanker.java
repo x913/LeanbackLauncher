@@ -1,6 +1,7 @@
 package com.amazon.tv.leanbacklauncher.apps;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -9,6 +10,7 @@ import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.amazon.tv.leanbacklauncher.MainActivity;
 import com.amazon.tv.leanbacklauncher.R;
 import com.amazon.tv.leanbacklauncher.apps.AppsDbHelper.Listener;
 import com.amazon.tv.leanbacklauncher.apps.AppsManager.SortingMode;
@@ -47,6 +49,19 @@ AppsRanker implements Listener {
 
     public interface RankingListener {
         void onRankerReady();
+    }
+
+    private Activity mActivity;
+
+    private void OnRankerReady() {
+        if (mActivity != null && mActivity instanceof MainActivity) {
+            MainActivity mainActivity = (MainActivity)mActivity;
+            mainActivity.onRankerReady();
+        }
+    }
+
+    public void setOnRankerReady(Activity activity) {
+        mActivity = activity;
     }
 
     private static class CachedAction {
@@ -234,12 +249,12 @@ AppsRanker implements Listener {
                 }
             }
             // LoggingUtils.logAppRankActionEvent(launchPoints, this.mEntities, this.mContext);
+            this.OnRankerReady();
         }
         return true;
     }
 
     public Comparator<LaunchPoint> getLaunchPointComparator() {
-        Log.d("Sorting mode ", getSortingMode().toString());
         if (this.mLaunchPointComparator == null) {
             this.mLaunchPointComparator = getSortingMode() == SortingMode.RECENCY ? new LaunchPointRecencyComparator() : new LaunchPointInstallComparator();
         }
@@ -247,6 +262,7 @@ AppsRanker implements Listener {
     }
 
     public int insertLaunchPoint(ArrayList<LaunchPoint> launchPoints, LaunchPoint newLp) {
+
         if (Log.isLoggable("AppsRanker", 2)) {
             Log.v("AppsRanker", "Inserting new LaunchPoint");
         }
