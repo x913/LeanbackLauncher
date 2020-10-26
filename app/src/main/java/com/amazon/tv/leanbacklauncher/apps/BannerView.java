@@ -34,7 +34,7 @@ import java.util.Iterator;
 import java.util.Random;
 
 public class BannerView extends FrameLayout implements  OnLongClickListener, DimmableItem, ParticipatesInLaunchAnimation, ParticipatesInScrollAnimation, OnEditModeChangedListener {
-    public static final int LONG_TOUCH_DURATION_MS = 2000;
+    public static final int LONG_TOUCH_DURATION_MS = 800;
     private RoundedRectOutlineProvider sOutline; // was static
     private View mAppBanner;
     private ViewDimmer mDimmer;
@@ -306,6 +306,8 @@ public class BannerView extends FrameLayout implements  OnLongClickListener, Dim
 
 
     public boolean onLongClick(View v) {
+
+
         int duration = LONG_TOUCH_DURATION_MS - ViewConfiguration.getLongPressTimeout();
         android.os.Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -327,7 +329,7 @@ public class BannerView extends FrameLayout implements  OnLongClickListener, Dim
             }
         }, duration > 0 ? duration : 0);
 
-        return false;
+        return true;
     }
 
     public void setSelected(boolean selected) {
