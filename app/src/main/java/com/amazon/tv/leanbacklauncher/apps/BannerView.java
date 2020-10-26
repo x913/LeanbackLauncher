@@ -4,11 +4,14 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnLongClickListener;
+import android.view.ViewConfiguration;
 import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -30,7 +33,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
 
-public class BannerView extends FrameLayout implements OnLongClickListener, DimmableItem, ParticipatesInLaunchAnimation, ParticipatesInScrollAnimation, OnEditModeChangedListener {
+public class BannerView extends FrameLayout implements  OnLongClickListener, DimmableItem, ParticipatesInLaunchAnimation, ParticipatesInScrollAnimation, OnEditModeChangedListener {
+    public static final int LONG_TOUCH_DURATION_MS = 2000;
     private RoundedRectOutlineProvider sOutline; // was static
     private View mAppBanner;
     private ViewDimmer mDimmer;
@@ -45,6 +49,7 @@ public class BannerView extends FrameLayout implements OnLongClickListener, Dimm
     private boolean mLeavingEditMode;
     private ArrayList<BannerSelectedChangedListener> mSelectedListeners;
     private AppsAdapter.AppViewHolder mViewHolder;
+    private boolean mUserIsTouching = false;
 
     public BannerView(Context context) {
         this(context, null);
@@ -67,8 +72,6 @@ public class BannerView extends FrameLayout implements OnLongClickListener, Dimm
             sOutline = new RoundedRectOutlineProvider((float) RowPreferences.getCorners(context));
         }
     }
-
-
 
     protected void onFinishInflate() {
         super.onFinishInflate();
@@ -288,18 +291,43 @@ public class BannerView extends FrameLayout implements OnLongClickListener, Dimm
         }
     }
 
-    public boolean onLongClick(View v) {
-        if (isEditable() && !this.mEditMode) {
-            this.mEditMode = true;
-            setSelected(true);
-            setEditMode();
-            return true;
-        } else if (!isEditable() || !this.mEditMode) {
-            return false;
-        } else {
-            onClickInEditMode();
-            return true;
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if(event.getAction() == MotionEvent.ACTION_DOWN) {
+            mUserIsTouching = true;
         }
+
+        if((event.getAction() == MotionEvent.ACTION_MOVE)||(event.getAction() == MotionEvent.ACTION_UP)) {
+            mUserIsTouching = false;
+        }
+
+        return super.onTouchEvent(event);
+    }
+
+
+    public boolean onLongClick(View v) {
+        int duration = LONG_TOUCH_DURATION_MS - ViewConfiguration.getLongPressTimeout();
+        android.os.Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(mUserIsTouching) {
+                    if (isEditable() && !mEditMode) {
+                        mEditMode = true;
+                        setSelected(true);
+                        setEditMode();
+
+                    } else if (!isEditable() || !mEditMode) {
+
+                    } else {
+                        onClickInEditMode();
+
+                    }
+                }
+            }
+        }, duration > 0 ? duration : 0);
+
+        return false;
     }
 
     public void setSelected(boolean selected) {

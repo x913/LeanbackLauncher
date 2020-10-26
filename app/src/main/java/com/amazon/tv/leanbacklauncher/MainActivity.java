@@ -432,22 +432,7 @@ public class MainActivity extends Activity implements OnEditModeChangedListener,
                             }
                             break;
                         case 3: // APPS
-                            //mHandler.sendEmptyMessage(3);
-                            if(child instanceof ActiveFrame) {
-//                                MainActivity.this.mHandler.postDelayed(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//                                        ActiveFrame activeFrame = (ActiveFrame)child;
-//                                        ActiveItemsRowView activeItemsRowView = activeFrame.mRow;
-//                                        View viewChild = activeItemsRowView.getChildAt(0);
-//                                        if(viewChild instanceof BannerView) {
-//                                            BannerView bannerView = (BannerView)viewChild;
-//                                            bannerView.requestFocus();
-//                                            bannerView.setSelected(true);
-//                                        }
-//                                    }
-//                                }, 1000);
-                            }
+
                             break;
                     }
                     if ((child instanceof IdleListener) && !MainActivity.this.mIdleListeners.contains(child)) {
