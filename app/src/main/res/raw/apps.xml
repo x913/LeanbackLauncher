@@ -3,6 +3,8 @@
     <boolean name="com.smartup.tv" value="false" />
     <boolean name="com.ionitech.airscreen" value="true" />
     <boolean name="com.mxtech.videoplayer.ad" value="true" />
+    <boolean name="com.liskovsoft.leankeyboard" value="true" />
     <boolean name="com.aurora.store" value="true" />
+    <boolean name="org.liskovsoft.leankeykeyboard.pro" value="true" />
     <boolean name="com.droidlogic.videoplayer" value="true" />
 </map>

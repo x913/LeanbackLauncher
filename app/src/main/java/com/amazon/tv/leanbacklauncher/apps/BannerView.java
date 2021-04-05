@@ -34,7 +34,7 @@ import java.util.Iterator;
 import java.util.Random;
 
 public class BannerView extends FrameLayout implements  OnLongClickListener, DimmableItem, ParticipatesInLaunchAnimation, ParticipatesInScrollAnimation, OnEditModeChangedListener {
-    public static final int LONG_TOUCH_DURATION_MS = 800;
+    public static final int LONG_TOUCH_DURATION_MS = 1000;
     private RoundedRectOutlineProvider sOutline; // was static
     private View mAppBanner;
     private ViewDimmer mDimmer;
@@ -50,6 +50,25 @@ public class BannerView extends FrameLayout implements  OnLongClickListener, Dim
     private ArrayList<BannerSelectedChangedListener> mSelectedListeners;
     private AppsAdapter.AppViewHolder mViewHolder;
     private boolean mUserIsTouching = false;
+
+    private final android.os.Handler mHandler = new Handler();
+    Runnable mLongPressed = new Runnable() {
+        public void run() {
+            if(mUserIsTouching) {
+                if (isEditable() && !mEditMode) {
+                    mEditMode = true;
+                    setSelected(true);
+                    setEditMode();
+
+                } else if (!isEditable() || !mEditMode) {
+
+                } else {
+                    onClickInEditMode();
+
+                }
+            }
+        }
+    };
 
     public BannerView(Context context) {
         this(context, null);
@@ -291,45 +310,38 @@ public class BannerView extends FrameLayout implements  OnLongClickListener, Dim
         }
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if(event.getAction() == MotionEvent.ACTION_DOWN) {
-            mUserIsTouching = true;
-        }
-
-        if((event.getAction() == MotionEvent.ACTION_MOVE)||(event.getAction() == MotionEvent.ACTION_UP)) {
-            mUserIsTouching = false;
-        }
-
-        return super.onTouchEvent(event);
-    }
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event) {
+//        if(event.getAction() == MotionEvent.ACTION_DOWN) {
+//            mUserIsTouching = true;
+//        }
+//
+////        if((event.getAction() == MotionEvent.ACTION_MOVE) || (event.getAction() == MotionEvent.ACTION_UP)) {
+//        if (event.getAction() == MotionEvent.ACTION_UP) {
+//            mUserIsTouching = false;
+//            mHandler.removeCallbacks(mLongPressed);
+//        }
+//
+//        return super.onTouchEvent(event);
+//    }
 
 
     public boolean onLongClick(View v) {
-
-
-        int duration = LONG_TOUCH_DURATION_MS - ViewConfiguration.getLongPressTimeout();
-        android.os.Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if(mUserIsTouching) {
-                    if (isEditable() && !mEditMode) {
-                        mEditMode = true;
-                        setSelected(true);
-                        setEditMode();
-
-                    } else if (!isEditable() || !mEditMode) {
-
-                    } else {
-                        onClickInEditMode();
-
-                    }
-                }
-            }
-        }, duration > 0 ? duration : 0);
-
-        return true;
+//        int duration = LONG_TOUCH_DURATION_MS - ViewConfiguration.getLongPressTimeout();
+//        mHandler.removeCallbacks(mLongPressed);
+//        mHandler.postDelayed(mLongPressed, duration > 0 ? duration : 0);
+//        return true;
+        if (isEditable() && !this.mEditMode) {
+            this.mEditMode = true;
+            setSelected(true);
+            setEditMode();
+            return true;
+        } else if (!isEditable() || !this.mEditMode) {
+            return false;
+        } else {
+            onClickInEditMode();
+            return true;
+        }
     }
 
     public void setSelected(boolean selected) {

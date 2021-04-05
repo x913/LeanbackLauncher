@@ -60,6 +60,8 @@ public class LauncherWallpaper extends FrameLayout implements HomeScrollFraction
         this.mScrollDarkeningOffset = (float) resources.getDimensionPixelOffset(R.dimen.home_scroll_size_search);
         this.mScrollDarkeningAmount = getResources().getFraction(R.fraction.wallpaper_scroll_darkening_amount, 1, 1);
         this.mWallpaperScrollScale = getResources().getFraction(R.fraction.wallpaper_to_launcher_scroll_scale, 1, 1);
+        //this.mWallpaperScrollScale = 1000f;
+        ///
         this.mZoom = getResources().getFraction(R.fraction.wallpaper_zoom_amount, 1, 1);
         this.mZoomThreshold = this.mScrollDarkeningOffset / getResources().getFraction(R.fraction.wallpaper_zoom_to_darkening_scale, 1, 1);
         this.mDimmer = ColorFilterDimmer.create(ColorFilterCache.getColorFilterCache(ContextCompat.getColor(context, R.color.launcher_background_color)), 0.0f, this.mScrollDarkeningAmount);
@@ -154,6 +156,7 @@ public class LauncherWallpaper extends FrameLayout implements HomeScrollFraction
 
     private void updateScrollPosition() {
         loadWallpaperIfNeeded();
+        //Log.d("AAA", String.format("mScrollPosition %s, mWallpaperScrollScale %s", mScrollPosition, mWallpaperScrollScale));
         int newPos = Math.round(((float) this.mScrollPosition) / this.mWallpaperScrollScale);
         this.mBackground.setY((float) newPos);
         this.mOverlay.setY((float) newPos);

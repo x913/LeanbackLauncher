@@ -98,16 +98,13 @@ public class WallpaperInstaller {
         canvas.drawColor(-16777216);
         systemBg.setBounds(0, 0, wallpaperWidth, wallpaperHeight);
         systemBg.draw(canvas);
+//        Bitmap maskBitmap = BitmapFactory.decodeResource(resources, R.drawable.bg_protection);
+//        BitmapDrawable maskDrawable = new BitmapDrawable(resources, maskBitmap);
+//        maskDrawable.setTileModeX(TileMode.REPEAT);
+//        maskDrawable.setTileModeY(TileMode.CLAMP);
+//        maskDrawable.setBounds(0, 0, wallpaperWidth, wallpaperHeight);
+//        maskDrawable.draw(canvas);
 
-        /*
-        Bitmap maskBitmap = BitmapFactory.decodeResource(resources, R.drawable.bg_protection);
-
-        BitmapDrawable maskDrawable = new BitmapDrawable(resources, maskBitmap);
-        maskDrawable.setTileModeX(TileMode.REPEAT);
-        maskDrawable.setTileModeY(TileMode.CLAMP);
-        maskDrawable.setBounds(0, 0, wallpaperWidth, wallpaperHeight);
-        maskDrawable.draw(canvas);
-        */
         return bitmap;
     }
 
